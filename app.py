@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 if os.path.exists('.env'):
     load_dotenv()
 
-os.environ["GROQ_API_KEY"] = os.environ.get('GROQ_API_KEY')
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 client = Groq()
 
 app = Flask(__name__)
