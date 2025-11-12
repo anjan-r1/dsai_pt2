@@ -3,10 +3,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-<div class="container">
-    <h2>Predicted DBS share price : {{r}}</h2>
-    <form action="/" method="post">
-        <input type="submit" value="Main">
+    <div class="container">
+    <h4>reply from LLAMA : {{r}}</h4>
+    <form action="/main" method="post">
+        <input type = "submit" value="Main">
     </form>
-</div>
+    </div>
 </body>
+
+
+

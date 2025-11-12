@@ -1,4 +1,14 @@
-from flask import Flask,render_template,request
+from flask import Flask, render_template, request
+import joblib
+import os
+from groq import Groq
+
+from dotenv import load_dotenv
+if os.path.exists('.env'):
+    load_dotenv()
+
+os.environ["GROQ_API_KEY"] = os.environ.get('GROQ_API_KEY')
+client = Groq()
 
 app = Flask(__name__)
 
@@ -6,10 +16,55 @@ app = Flask(__name__)
 def index():
     return(render_template("index.html"))
 
-@app.route("/prediction",methods=["GET","POST"])
-def prediction():
+@app.route("/main",methods=["GET","POST"])
+def main():
+    return(render_template("main.html"))
+
+@app.route("/dbs",methods=["GET","POST"])
+def dbs():
+    return(render_template("dbs.html"))
+
+
+@app.route("/dbs_prediction",methods=["GET","POST"])
+def dbs_prediction():
     q = float(request.form.get("q"))
-    return(render_template("prediction.html", r=(-50.6*q)+90.2))
+    model = joblib.load("DBS_SGD_model.pkl")
+    r = model.predict([[q]])
+    return(render_template("dbs_prediction.html",r=r))
+
+@app.route("/chatbot",methods=["GET","POST"])
+def chatbot():
+    return(render_template("chatbot.html"))
+
+@app.route("/llama",methods=["GET","POST"])
+def llama():
+    return(render_template("llama.html"))
+
+@app.route("/chatgpt",methods=["GET","POST"])
+def chatgpt():
+    return(render_template("chatgpt.html"))
+
+@app.route("/llama_result",methods=["GET","POST"])
+def llama_result():
+    q = request.form.get("q")
+    r = client.chat.completions.create(
+    model="llama-3.1-8b-instant",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": q}])
+    r = r.choices[0].message.content
+    return(render_template("llama_result.html",r=r))
+
+@app.route("/chatgpt_result",methods=["GET","POST"])
+def chatgpt_result():
+    q = request.form.get("q")
+    r = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": q}])
+    r = r.choices[0].message.content
+    return(render_template("chatgpt_result.html",r=r))
 
 if __name__ == "__main__":
     app.run()
